@@ -1,135 +1,94 @@
 import React, { useState } from 'react'
 
-const UserForm = (props) => {
-    const [firstName, setfirstName] = useState("");
-    const [firstNameError, setfirstNameError] = useState("");
-    const [lastName, setlastName] = useState("");
-    const [lastNameError, setlastNameError] = useState("");
-    const [email, setEmail] = useState("");
-    const [emailError, setEmailError] = useState("");
-    const [password, setPassword] = useState("");
-    const [passError, setPassError] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [confPassError, setConfPassError] = useState("");
+const UserForm = () => {
 
+    const [form, setForm] = useState({
+        firstName : {value : "", hasError: false, error: "First Name must be at least 2 characters", validation: {type: "length", value: 2}},
+        lastName : {value: "", hasError: false, error:"Last Name must be at least 2 characters", validation: {type: "length", value: 2}},
+        email: {value: "", hasError: false, error:"Email must be at least 5 characters", validation: {type: "length", value: 5}},
+        password : {value: "", hasError: false, error:"Passwords must be at least 8 characters", validation: {type: "length", value: 8}},
+        confPassword: {value: "", hasError: false, error:"Passwords must match", validation: {type: "comparison"}}
+    });
 
-    const handleFirstName = (e) => {
-        if(e.target.value.length < 2) {
-            setfirstNameError("First Name must be at least 2 characters");
-        } else {
-            setfirstName(e.target.value);
-            // firstName = e.target.value; 
-            setfirstNameError("");
-        }
+    const validator = (e) => {
+        switch (form[e.target.name]["validation"].type){
+            case "length":
+                return e.target.value.length < form[e.target.name]["validation"].value;
+            case "comparison":
+                return e.target.value != form["password"].value;
+        }   
+    }
+    const handleForm = (e) => {
+        let name = e.target.name;
+        let copy = structuredClone(form);
+        copy[name].value = e.target.value;
+        copy[name].hasError = validator(e);
+         setForm({
+                ...copy
+                })
     }
 
-    const handleLastName = (e) => {
-        if(e.target.value.length < 2){
-            setlastNameError("Last Name must be at least 2 characters");
-        } else {
-            setlastName(e.target.value);
-            setlastNameError("");
-        }
-    }
-
-    const handleEmail = (e) => {
-        if(e.target.value.length < 5){
-            setEmailError("Email must be at least 5 characters");
-        } else {
-            setEmail(e.target.value);
-            setEmailError("");
-        }
-    }
-
-    const handlePassword = (e) => {
-        if(e.target.value.length < 8){
-            setPassError("Passwords must be at least 8 characters");
-        } else { 
-            setPassword(e.target.value);
-            setPassError("");
-        }
-    }
-
-    const handleConfirmPassword = (e) => {
-        if(e.target.value != password){
-            setConfPassError("Passwords must match")
-        } else{
-            setConfirmPassword(e.target.value);
-            setConfPassError("");
-        }
-    }
-
-
-    
-
-
-    // const [form, setForm] = useState({});
-
-    const createUser = (e) => {
-        e.preventDefault();
-        const newUser = { username, email, password };
-        setForm(newUser)
-    };
     return (
-        <form onSubmit= { createUser }>
+        <form>
             <div>
                 {
-                    firstNameError ? 
-                    <p style={{ color: 'red'}}> { firstNameError } </p> :
+                    form.firstName.hasError ? 
+                    <p style={{ color: 'red'}}> {form.firstName.error} </p> :
                     ''
                 }
 
                 <label>First Name: </label>
-                <input type="text" onChange={ handleFirstName } />
+                <input type="text" onBlur={ handleForm} name="firstName" />
             </div>
             <div>
                 {
-                    lastNameError ? 
-                    <p style={{ color: 'red'}}> { lastNameError } </p> :
+                    form.lastName.hasError ? 
+                    <p style={{ color: 'red'}}> { form.lastName.error } </p> :
                     ''
                 }
                 <label>Last Name: </label>
-                <input type="text" onChange={handleLastName} />
+                <input type="text" onBlur={ handleForm } name="lastName"/>
             </div>
             <div>
                 {
-                    emailError ? 
-                    <p style={{ color: 'red'}}> { emailError } </p> :
+                    form.email.hasError ? 
+                    <p style={{ color: 'red'}}> { form.email.error } </p> :
                     ''
                 }
                 <label>Email Address: </label>
-                <input type="text" onChange={ handleEmail } />
+                <input type="text" onBlur={ handleForm } name="email"/>
             </div>
             <div>
                 {
-                    passError ? 
-                    <p style={{ color: 'red'}}> { passError } </p> :
+                    form.password.hasError ? 
+                    <p style={{ color: 'red'}}> { form.password.error } </p> :
                     ''
                 }
                 <label>Password: </label>
-                <input type="password" onChange={ handlePassword } />
+                <input type="password" onBlur={ handleForm } name="password"/>
             </div>
 
             <div>
                 {
-                    confPassError ? 
-                    <p style={{ color: 'red'}}> { confPassError } </p> :
+                    form.confPassword.hasError ? 
+                    <p style={{ color: 'red'}}> { form.confPassword.error } </p> :
                     ''
                 }
                 <label>Confirm Password: </label>
-                <input type="password" onChange={ handleConfirmPassword } />
+                <input type="password" onBlur={ handleForm } name="confPassword"/>
             </div>
             <input type="submit" value="Create User" />
             <div>
                 <h1 className="text-danger">Form Data: </h1>
-                <p>First Name: { firstName } </p>
-                <p>Last Name: { lastName } </p>
-                <p>Email: { email } </p>
-                <p>Password: { password } </p>
-                <p>Confirm Password: { confirmPassword } </p>
+                <p>First Name: { form.firstName.value } </p>
+                <p>Last Name: { form.lastName.value } </p>
+                <p>Email: { form.email.value } </p>
+                <p>Password: { form.password.value } </p>
+                <p>Confirm Password: { form.confPassword.value } </p>
             </div>
         </form>
     )
 }
 
-export default UserForm
+
+export default UserForm;
